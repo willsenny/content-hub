@@ -25,56 +25,58 @@ AI：DeepSeek V4 Flash（仅此一个模型），峰谷计价，所有 AI 调用
 部署：Docker + 自有服务器（非 Vercel，因需长驻定时任务）
 
 ---
+
 ## 三、目录结构
 
-content-hub/
-  .opencode/
-    config.json
-    commands/
-  prisma/
-    schema.prisma
-    migrations/
-    seed.ts
-  public/
-  src/
-    app/
-      (auth)/
-      (dashboard)/
-      api/
-        auth/
-        novels/
-        news/
-        games/
-        cron/
-      novels/
-      news/
-      games/
-      admin/
-      layout.tsx
-      page.tsx
-    components/
-      ui/
-      novels/
-      news/
-      games/
-      shared/
-    lib/
-      auth.ts
-      prisma.ts
-      deepseek.ts
-      rss.ts
-      utils.ts
-    types/
-    hooks/
-    stores/
-    middleware.ts
-  scripts/
-    fetch-news.ts
-  .env.example
-  docker-compose.yml
-  Dockerfile
-  AGENTS.md
-  package.json
+- content-hub/
+  - .opencode/
+    - config.json
+    - commands/
+  - prisma/
+    - schema.prisma
+    - migrations/
+    - seed.ts
+  - public/
+  - src/
+    - app/
+      - (auth)/
+      - (dashboard)/
+      - api/
+        - auth/
+        - novels/
+        - news/
+        - games/
+        - cron/
+      - novels/
+      - news/
+      - games/
+      - admin/
+      - layout.tsx
+      - page.tsx
+    - components/
+      - ui/
+      - novels/
+      - news/
+      - games/
+      - shared/
+    - lib/
+      - auth.ts
+      - prisma.ts
+      - deepseek.ts
+      - rss.ts
+      - utils.ts
+    - types/
+    - hooks/
+    - stores/
+    - middleware.ts
+  - scripts/
+    - fetch-news.ts
+  - .env.example
+  - docker-compose.yml
+  - Dockerfile
+  - AGENTS.md
+  - package.json
+
 ---
 
 ## 四、用户角色
