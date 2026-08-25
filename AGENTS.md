@@ -25,7 +25,6 @@ AI：DeepSeek V4 Flash（仅此一个模型），峰谷计价，所有 AI 调用
 部署：Docker + 自有服务器（非 Vercel，因需长驻定时任务）
 
 ---
-
 ## 三、目录结构
 
 content-hub/
@@ -76,7 +75,6 @@ content-hub/
   Dockerfile
   AGENTS.md
   package.json
-
 ---
 
 ## 四、用户角色
