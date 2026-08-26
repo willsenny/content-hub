@@ -16,6 +16,14 @@ export async function middleware(req: NextRequest) {
   const isApi = pathname.startsWith("/api");
 
   if (isApi) {
+    const publicGet =
+      req.method === "GET" &&
+      (pathname === "/api/novels" || pathname.startsWith("/api/novels/"));
+
+    if (publicGet) {
+      return NextResponse.next();
+    }
+
     if (!token) {
       return NextResponse.json(
         { success: false, error: "未登录" },
