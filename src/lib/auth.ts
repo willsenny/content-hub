@@ -66,5 +66,23 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      const { pathname } = new URL(url, baseUrl);
+
+      if (pathname.includes("/dashboard")) {
+        return `${baseUrl}/novels`;
+      }
+
+      if (
+        pathname.startsWith("/") &&
+        !pathname.startsWith("//") &&
+        pathname !== "/login" &&
+        pathname !== "/register"
+      ) {
+        return url;
+      }
+
+      return `${baseUrl}/novels`;
+    },
   },
 };

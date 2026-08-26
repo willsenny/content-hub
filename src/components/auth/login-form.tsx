@@ -30,7 +30,15 @@ export default function LoginForm() {
       return;
     }
 
-    router.push("/dashboard");
+    const rawCallback = new URLSearchParams(window.location.search).get(
+      "callbackUrl",
+    );
+    const callbackUrl =
+      rawCallback && rawCallback.startsWith("/")
+        ? rawCallback
+        : "/novels";
+
+    router.push(callbackUrl);
     router.refresh();
   }
 

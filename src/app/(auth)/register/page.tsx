@@ -8,7 +8,7 @@ export default async function RegisterPage() {
   const session = await getServerSession(authOptions);
 
   if (session?.user) {
-    redirect("/dashboard");
+    redirect("/novels");
   }
 
   return (

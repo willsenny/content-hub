@@ -33,19 +33,38 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!token) {
-    const url = new URL("/login", req.url);
-    url.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(url);
+  if (pathname.startsWith("/admin")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    if (token.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/novels", req.url));
+    }
+    return NextResponse.next();
   }
 
-  if (pathname.startsWith("/admin") && token.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  const editorPath =
+    pathname.startsWith("/novels/create") ||
+    /^\/novels\/[^/]+\/edit$/.test(pathname) ||
+    /^\/novels\/[^/]+\/chapters\/[^/]+\/edit$/.test(pathname);
+
+  if (editorPath) {
+    if (!token) {
+      const url = new URL("/login", req.url);
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
+    }
+    if (token.role !== "AUTHOR" && token.role !== "ADMIN") {
+      const url = new URL("/novels", req.url);
+      url.searchParams.set("error", "forbidden");
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/api/:path*"],
+  matcher: ["/admin/:path*", "/novels/create/:path*", "/novels/:path*", "/api/:path*"],
 };
