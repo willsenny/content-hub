@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
+
+.reader-body {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", serif;
+}
+
+.reader-body .reader-paragraph {
+  text-indent: 2em;
+  margin-bottom: 1.25rem;
+  text-align: justify;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .reader-body .reader-paragraph {
+    color: #e5e5e5;
+  }
+}
