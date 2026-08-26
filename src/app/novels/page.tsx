@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 
 import { NovelList } from "@/components/novels/novel-list";
 import { authOptions } from "@/lib/auth";
-import { listPublicNovels } from "@/lib/novels";
+import { listNovelsForUser } from "@/lib/novels";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +14,10 @@ interface PageProps {
 
 export default async function NovelsPage({ searchParams }: PageProps) {
   const page = Math.max(1, Number(searchParams.page) || 1);
-  const data = await listPublicNovels(page, 20);
 
   const session = await getServerSession(authOptions);
+  const data = await listNovelsForUser(session?.user ?? null, page, 20);
+
   const canCreate =
     session?.user?.role === Role.AUTHOR || session?.user?.role === Role.ADMIN;
 

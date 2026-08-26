@@ -1,4 +1,5 @@
-import type { NovelStatus } from "@prisma/client";
+import type { Role, NovelStatus } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
@@ -14,11 +15,29 @@ export interface NovelListItem {
   publishedChapters: number;
 }
 
-export async function listPublicNovels(page = 1, pageSize = 20) {
+const PUBLIC_STATUSES = ["ONGOING", "COMPLETED"] as NovelStatus[];
+
+export async function listNovelsForUser(
+  user: { id: string; role: Role } | null,
+  page = 1,
+  pageSize = 20,
+) {
   const skip = (page - 1) * pageSize;
-  const where = {
-    status: { in: ["ONGOING", "COMPLETED"] as NovelStatus[] },
-  };
+
+  let where: Prisma.NovelWhereInput = {};
+
+  if (user?.role === "ADMIN") {
+    where = {};
+  } else if (user?.role === "AUTHOR") {
+    where = {
+      OR: [
+        { status: { in: PUBLIC_STATUSES } },
+        { authorId: user.id },
+      ],
+    };
+  } else {
+    where = { status: { in: PUBLIC_STATUSES } };
+  }
 
   const [items, total] = await Promise.all([
     prisma.novel.findMany({
@@ -35,9 +54,8 @@ export async function listPublicNovels(page = 1, pageSize = 20) {
         totalChapters: true,
         updatedAt: true,
         author: { select: { name: true } },
-        chapters: {
-          where: { status: "PUBLISHED" },
-          select: { id: true },
+        _count: {
+          select: { chapters: { where: { status: "PUBLISHED" } } },
         },
       },
     }),
@@ -53,7 +71,7 @@ export async function listPublicNovels(page = 1, pageSize = 20) {
     totalChapters: n.totalChapters,
     updatedAt: n.updatedAt,
     author: n.author,
-    publishedChapters: n.chapters.length,
+    publishedChapters: n._count.chapters,
   }));
 
   return { items: mapped, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
