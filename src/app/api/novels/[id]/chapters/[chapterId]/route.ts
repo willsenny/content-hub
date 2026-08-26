@@ -14,10 +14,13 @@ function countWords(content: string): number {
   return zh + en;
 }
 
-async function getChapter(params: Params, includePrivate: boolean) {
+async function getChapter(
+  ids: { novelId: string; chapterId: string },
+  includePrivate: boolean,
+) {
   const where: { novelId: string; id: string; status?: "PUBLISHED" } = {
-    novelId: params.id,
-    id: params.chapterId,
+    novelId: ids.novelId,
+    id: ids.chapterId,
   };
   if (!includePrivate) where.status = "PUBLISHED";
 
@@ -46,7 +49,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
   });
   const canEdit = isAdmin(user) || (user && novel?.authorId === user.id);
 
-  const chapter = await getChapter(params, !!canEdit);
+  const chapter = await getChapter(
+    { novelId: params.id, chapterId: params.chapterId },
+    !!canEdit,
+  );
   if (!chapter) return fail("章节不存在", 404);
   return ok(chapter);
 }
