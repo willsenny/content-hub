@@ -1,20 +1,54 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
 
+/* 阅读器核心容器：护眼米黄底 + 深灰字，!important 已隔离系统深色模式 */
 .reader-body {
-  font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", serif;
+  background-color: #f6f4ec !important; /* 纯白底改 #ffffff */
+  color: #333333 !important;
+  font-family: 'Noto Serif SC', 'SimSun', serif;
 }
 
-.reader-body .reader-paragraph {
-  text-indent: 2em;
-  margin-bottom: 1.25rem;
-  text-align: justify;
-  font-size: 1.125rem;
+/* 正文段落 */
+.reader-paragraph {
+  color: #333333 !important;
+  font-size: 18px;
   line-height: 1.8;
-  color: #333;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  text-indent: 2em;
+  text-align: justify;
 }
 
-@media (prefers-color-scheme: dark) {
-  .reader-body .reader-paragraph {
-    color: #e5e5e5;
-  }
+/* 标题 */
+.reader-title {
+  color: #222222 !important;
+  font-family: 'Noto Serif SC', 'SimSun', serif;
+}
+
+/* 章节信息/字数等弱化文字 */
+.reader-meta {
+  color: #888888 !important;
+}
+
+/* 底部不要再留空的 @media 块了，上面锁死即可 */
+
+.reader-nav {
+  background-color: #f6f4ec !important;
+  border-bottom: 1px solid #e2ddc8 !important; /* 顶部极淡暖灰分割线，替代发白的灰 */
+}
+
+.reader-nav a, .reader-nav button {
+  color: #555555 !important;
+  border: none !important;             /* 干掉顶部按钮边框 */
+  background: transparent !important;
+}
+.reader-nav a:hover, .reader-nav button:hover {
+  color: #222222 !important;
+  background-color: #ebe7df !important;
+  border: none !important;
+}
+/* 底部操作栏统一护眼色 */
+.reader-footer {
+  background-color: #f6f4ec !important;
+  border-top: 1px solid #e2ddc8 !important;
 }

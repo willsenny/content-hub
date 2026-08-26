@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api-client";
 
@@ -85,55 +86,57 @@ export function ChapterForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex gap-4">
+      <Card className="flex flex-col gap-4">
+        <div className="flex gap-4">
+          <label className="flex flex-col gap-1 text-sm">
+            章节号
+            <Input
+              type="number"
+              min={1}
+              value={chapterNumber}
+              onChange={(e) => setChapterNumber(Number(e.target.value))}
+              className="w-20"
+              required
+            />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm">
+            章节标题 <span className="text-red-500">*</span>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              placeholder="章节标题"
+              title={title}
+              className="truncate"
+            />
+          </label>
+        </div>
+
         <label className="flex flex-col gap-1 text-sm">
-          章节号
-          <Input
-            type="number"
-            min={1}
-            value={chapterNumber}
-            onChange={(e) => setChapterNumber(Number(e.target.value))}
-            className="w-20"
+          正文
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             required
+            placeholder="在这里写正文…"
+            className="min-h-[560px] w-full resize-y rounded-lg border border-gray-300 p-4 font-mono text-sm leading-relaxed outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </label>
-        <label className="flex flex-1 flex-col gap-1 text-sm">
-          章节标题 <span className="text-red-500">*</span>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            placeholder="章节标题"
-            title={title}
-            className="truncate"
-          />
-        </label>
-      </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        正文
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          placeholder="在这里写正文…"
-          className="w-full min-h-[500px] resize-y rounded-lg border border-gray-300 p-4 font-mono text-sm leading-relaxed outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
-      </label>
+        <div>
+          <span className="mb-1 block text-sm">状态</span>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="DRAFT">草稿</option>
+            <option value="PUBLISHED">已发布</option>
+          </select>
+        </div>
+      </Card>
 
-      <div>
-        <span className="mb-1 block text-sm">状态</span>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="DRAFT">草稿</option>
-          <option value="PUBLISHED">已发布</option>
-        </select>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between">
+      <div className="sticky bottom-4 flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
         <span className="text-xs text-gray-400">
           已输入 {content.length} 字
         </span>

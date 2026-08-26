@@ -59,19 +59,19 @@ export default async function ReaderPage({ params }: PageProps) {
     .map((p) => p.trim())
     .filter(Boolean);
 
-  const topLink = (to: string, label: string, disabled: boolean) => (
-    <Link
-      href={to}
-      aria-disabled={disabled}
-      className={`rounded border px-3 py-1 text-sm ${
-        disabled
-          ? "pointer-events-none text-gray-300"
-          : "hover:bg-gray-50 dark:hover:bg-gray-800"
-      }`}
-    >
-      {label}
-    </Link>
-  );
+const topLink = (to: string, label: string, disabled: boolean) => (
+  <Link
+    href={to}
+    aria-disabled={disabled}
+    className={`rounded px-3 py-1 text-sm transition-colors ${
+      disabled
+        ? "pointer-events-none text-[#a09d96] opacity-50"
+        : "text-[#555555] hover:text-[#222222] hover:bg-[#ebe7df]"
+    }`}
+  >
+    {label}
+  </Link>
+);
 
   const bottomLink = (
     to: string,
@@ -86,8 +86,8 @@ export default async function ReaderPage({ params }: PageProps) {
         href={to}
         className={
           primary
-            ? "rounded bg-blue-600 px-5 py-2 text-sm text-white hover:bg-blue-700"
-            : "rounded border px-5 py-2 text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-300"
+            ? "inline-flex items-center justify-center rounded-lg px-8 py-3 text-base font-medium text-[#555555] hover:text-[#222222] hover:bg-[#ebe7df] transition-colors"
+            : "inline-flex items-center justify-center rounded-lg border border-[#e2ddc8] px-8 py-3 text-base font-medium text-[#555555] hover:text-[#222222] hover:border-[#d5d0ba] hover:bg-[#ebe7df] transition-colors"
         }
       >
         {label}
@@ -95,59 +95,59 @@ export default async function ReaderPage({ params }: PageProps) {
     );
 
   return (
-    <main className="reader-body mx-auto max-w-3xl px-6 py-8">
+    <main className="reader-body mx-auto max-w-3xl px-6 py-8 relative z-10">
       {chapter.status === "DRAFT" && (
         <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
           ⚠️ 当前章节为草稿，内容可能随时变动
         </div>
       )}
 
-      <div className="mb-6 flex items-center justify-between gap-2 border-b border-gray-200 pb-3">
+      <div className="reader-nav sticky top-0 z-10 -mx-6 mb-6 flex items-center justify-between gap-2 px-6 py-3">
         <Link
           href={`/novels/${novel.id}`}
-          className="text-sm text-blue-600 hover:underline"
+          className="shrink-0 text-sm"
         >
           ← 返回小说详情
         </Link>
-        <span className="truncate px-4 text-sm text-gray-500">
+        <span className="truncate px-2 text-sm">
           {novel.title} · 第{chapter.chapterNumber}章
         </span>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           {prev ? (
             topLink(`/novels/${novel.id}/read/${prev.id}`, "← 上一章", false)
           ) : (
-            <span className="rounded border px-3 py-1 text-sm text-gray-300">
+            <span className="rounded px-3 py-1 text-sm">
               ← 上一章
             </span>
           )}
           {next ? (
             topLink(`/novels/${novel.id}/read/${next.id}`, "下一章 →", false)
           ) : (
-            <span className="rounded border px-3 py-1 text-sm text-gray-300">
+            <span className="rounded px-3 py-1 text-sm">
               下一章 →
             </span>
           )}
         </div>
       </div>
 
-      <h1 className="mb-4 text-center text-3xl font-bold tracking-wide">
+      <h1 className="reader-title mb-4 text-center text-3xl font-bold tracking-wide">
         {chapter.title}
       </h1>
 
-      <p className="mb-6 text-center text-sm text-gray-400">
+      <p className="reader-meta mb-6 text-center text-sm">
         {chapter.wordCount} 字 ·{" "}
         {new Date(chapter.updatedAt).toLocaleDateString("zh-CN")}
       </p>
 
       <article>
         {paragraphs.map((p, i) => (
-          <p key={i} className="reader-paragraph">
+          <p key={i} className="reader-paragraph" >
             {p}
           </p>
         ))}
       </article>
 
-      <div className="mt-12 flex justify-center gap-4 border-t border-gray-200 pt-6">
+      <div className="reader-footer mt-12 flex justify-center gap-4 pt-8">
         {prev
           ? bottomLink(
               `/novels/${novel.id}/read/${prev.id}`,
