@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  AUTHOR
+  ADMIN
+}
+
+enum NovelStatus {
+  DRAFT
+  ONGOING
+  COMPLETED
+}
+
+enum ChapterStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role     @default(USER)
+  openid        String?  @unique
+  unionid       String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  novels          Novel[]
+  readingProgress ReadingProgress[]
+
+  @@map("users")
+}
+
+model Novel {
+  id            String      @id @default(cuid())
+  title         String
+  authorId      String
+  synopsis      String?
+  coverImage    String?
+  status        NovelStatus @default(DRAFT)
+  totalChapters Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  author          User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  chapters        NovelChapter[]
+  readingProgress ReadingProgress[]
+
+  @@index([authorId])
+  @@index([status, createdAt])
+  @@map("novels")
+}
+
+model NovelChapter {
+  id            String        @id @default(cuid())
+  novelId       String
+  chapterNumber Int
+  title         String
+  content       String        @db.Text
+  wordCount     Int           @default(0)
+  status        ChapterStatus @default(DRAFT)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  novel           Novel            @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  readingProgress ReadingProgress[]
+
+  @@unique([novelId, chapterNumber])
+  @@index([novelId, status])
+  @@map("novel_chapters")
+}
+
+model ReadingProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  novelId   String
+  chapterId String?
+  position  Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  novel   Novel        @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  chapter NovelChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, novelId])
+  @@index([userId])
+  @@map("reading_progress")
+}
