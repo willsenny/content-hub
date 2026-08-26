@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { Role } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
@@ -31,12 +32,23 @@ export default async function EditChapterPage({ params }: PageProps) {
   if (!chapter || chapter.novelId !== novel.id) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">
-        编辑章节 — {novel.title}
-      </h1>
+    <main className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <Link
+          href={`/novels/${novel.id}`}
+          className="text-sm text-gray-500 hover:text-gray-700"
+        >
+          ← 返回小说详情
+        </Link>
+        <span className="text-sm text-gray-400">
+          {novel.title}
+          <span className="mx-1">·</span>
+          <span className="font-semibold text-gray-800">编辑章节</span>
+        </span>
+      </div>
       <ChapterForm
         novelId={novel.id}
+        mode="edit"
         initialChapterNumber={novel.totalChapters + 1}
         chapterId={chapter.id}
         initial={{
