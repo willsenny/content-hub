@@ -16,6 +16,11 @@ export default async function Home() {
       <h1>Content Hub</h1>
       <p>Phase 1 — Prisma 客户端就绪</p>
       <p>数据库：{dbStatus}</p>
+      <p>
+        <a href="/novels" className="text-blue-600 underline">
+          前往小说列表
+        </a>
+      </p>
     </main>
   );
 }
