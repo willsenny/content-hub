@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api-client";
 import type { NovelListItem } from "@/lib/novels";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -48,8 +52,30 @@ function CoverPlaceholder({
   );
 }
 
-export function NovelCard({ novel }: { novel: NovelListItem }) {
+interface NovelCardProps {
+  novel: NovelListItem;
+  canDelete: boolean;
+}
+
+export function NovelCard({ novel, canDelete }: NovelCardProps) {
+  const router = useRouter();
   const gradient = coverGradient(novel.title);
+
+  async function handleDelete() {
+    if (
+      !window.confirm(
+        `确定删除《${novel.title}》及所有章节？此操作不可恢复`,
+      )
+    ) {
+      return;
+    }
+    try {
+      await api.delete(`/api/novels/${novel.id}`);
+      router.refresh();
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "删除失败");
+    }
+  }
 
   return (
     <Link href={`/novels/${novel.id}`} className="group block h-full">
@@ -74,8 +100,25 @@ export function NovelCard({ novel }: { novel: NovelListItem }) {
             >
               {STATUS_LABEL[novel.status] ?? novel.status}
             </span>
-            <span className="shrink-0 text-xs text-gray-400">
-              {novel.publishedChapters} 章
+            <span className="flex shrink-0 items-center gap-1">
+              <span className="text-xs text-gray-400">
+                {novel.publishedChapters} 章
+              </span>
+              {canDelete && (
+                <button
+                  type="button"
+                  aria-label="删除小说"
+                  title="删除小说"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDelete();
+                  }}
+                  className="rounded px-1 text-base leading-none text-gray-300 transition hover:bg-red-50 hover:text-red-600"
+                >
+                  ×
+                </button>
+              )}
             </span>
           </div>
 

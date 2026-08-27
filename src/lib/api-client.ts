@@ -16,6 +16,10 @@ export async function apiFetch<T>(
     },
   });
 
+  if (res.status === 204 || (res.headers.get("content-length") ?? "") === "0") {
+    return undefined as T;
+  }
+
   const json: ApiResult<T> = await res.json().catch(() => ({
     success: false,
     error: "服务器响应异常",

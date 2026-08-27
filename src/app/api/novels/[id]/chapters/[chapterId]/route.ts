@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ChapterStatus } from "@prisma/client";
-
+import { sha256 } from '@/lib/copyright';
 import { prisma } from "@/lib/prisma";
 import { fail, getSessionUser, isAdmin, ok } from "@/lib/api";
 
@@ -83,6 +83,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     content?: string;
     wordCount?: number;
     status?: ChapterStatus;
+    contentHash?: string;
+    revisionNote?: string | null;
+    aiPromptLog?: string | null;
+    createdAt?: Date;
   } = {};
 
   if (typeof body?.title === "string") {
@@ -95,6 +99,25 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (!body.content.trim()) return fail("章节内容不能为空", 400);
     data.content = body.content;
     data.wordCount = countWords(body.content);
+
+    const note = (body.revisionNote || "").trim();
+    const log = (body.aiPromptLog || "").trim();
+    if (note) {
+      data.revisionNote = note;
+      data.aiPromptLog = log
+        ? log
+        : JSON.stringify([{ round: 0, note: "人工重构", detail: note }]);
+    } else {
+      data.revisionNote = null;
+      data.aiPromptLog = null;
+    }
+
+    data.contentHash = sha256(
+      [body.content, data.revisionNote ?? "", data.aiPromptLog ?? ""].join(
+        "||",
+      ),
+    );
+    data.createdAt = new Date();
   }
   if (
     body?.status === ChapterStatus.PUBLISHED ||
@@ -131,11 +154,13 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     return fail("章节不存在", 404);
   }
 
-  await prisma.novelChapter.delete({ where: { id: existing.id } });
-  await prisma.novel.update({
-    where: { id: novel.id },
-    data: { totalChapters: { decrement: 1 } },
+  await prisma.$transaction(async (tx) => {
+    await tx.novelChapter.delete({ where: { id: existing.id } });
+    await tx.novel.update({
+      where: { id: novel.id },
+      data: { totalChapters: { decrement: 1 } },
+    });
   });
 
-  return ok({ id: existing.id });
+  return new NextResponse(null, { status: 204 });
 }

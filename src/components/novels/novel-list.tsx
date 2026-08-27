@@ -8,9 +8,18 @@ interface NovelListProps {
   basePath: string;
   page: number;
   totalPages: number;
+  currentUserId: string | null;
+  isAdmin: boolean;
 }
 
-export function NovelList({ items, basePath, page, totalPages }: NovelListProps) {
+export function NovelList({
+  items,
+  basePath,
+  page,
+  totalPages,
+  currentUserId,
+  isAdmin,
+}: NovelListProps) {
   if (items.length === 0) {
     return <p className="py-16 text-center text-gray-400">暂无小说</p>;
   }
@@ -19,7 +28,11 @@ export function NovelList({ items, basePath, page, totalPages }: NovelListProps)
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((novel) => (
-          <NovelCard key={novel.id} novel={novel} />
+          <NovelCard
+            key={novel.id}
+            novel={novel}
+            canDelete={isAdmin || currentUserId === novel.authorId}
+          />
         ))}
       </div>
 

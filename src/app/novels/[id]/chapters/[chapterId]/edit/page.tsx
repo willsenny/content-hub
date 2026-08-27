@@ -56,6 +56,8 @@ export default async function EditChapterPage({ params }: PageProps) {
           title: chapter.title,
           content: chapter.content,
           status: chapter.status,
+          revisionNote: chapter.revisionNote,
+          aiPromptLog: chapter.aiPromptLog,
         }}
       />
     </main>

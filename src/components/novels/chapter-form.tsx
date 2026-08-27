@@ -21,6 +21,8 @@ interface ChapterFormProps {
     title: string;
     content: string;
     status: string;
+    revisionNote?: string | null;
+    aiPromptLog?: string | null;
   };
 }
 
@@ -38,6 +40,10 @@ export function ChapterForm({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [content, setContent] = useState(initial?.content ?? "");
   const [status, setStatus] = useState(initial?.status ?? "DRAFT");
+  const [revisionNote, setRevisionNote] = useState(
+    initial?.revisionNote ?? "",
+  );
+  const [aiPromptLog, setAiPromptLog] = useState(initial?.aiPromptLog ?? "");
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -53,7 +59,14 @@ export function ChapterForm({
     setError(null);
     setSaveState("saving");
 
-    const body = { chapterNumber, title, content, status };
+    const body = {
+      chapterNumber,
+      title,
+      content,
+      status,
+      revisionNote,
+      aiPromptLog,
+    };
     try {
       const url = chapterId
         ? `/api/novels/${novelId}/chapters/${chapterId}`
@@ -73,6 +86,18 @@ export function ChapterForm({
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存失败");
+      setSaveState("error");
+    }
+  }
+
+  async function handleDeleteChapter() {
+    if (!chapterId) return;
+    if (!window.confirm("确定删除本章？此操作不可恢复")) return;
+    try {
+      await api.delete(`/api/novels/${novelId}/chapters/${chapterId}`);
+      router.push(`/novels/${novelId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "删除失败");
       setSaveState("error");
     }
   }
@@ -114,13 +139,18 @@ export function ChapterForm({
 
         <label className="flex flex-col gap-1 text-sm">
           正文
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            placeholder="在这里写正文…"
-            className="min-h-[560px] w-full resize-y rounded-lg border border-gray-300 p-4 font-mono text-sm leading-relaxed outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
+          <div className="relative">
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+              placeholder="在这里写正文…"
+              className="min-h-[560px] w-full resize-y rounded-lg border border-gray-300 p-4 pb-8 font-mono text-sm leading-relaxed outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <span className="pointer-events-none absolute bottom-2 right-3 text-xs text-gray-400">
+              已输入 {content.length} 字
+            </span>
+          </div>
         </label>
 
         <div>
@@ -137,26 +167,60 @@ export function ChapterForm({
       </Card>
 
       <div className="sticky bottom-4 flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
-        <span className="text-xs text-gray-400">
-          已输入 {content.length} 字
-        </span>
-        <div className="flex items-center gap-3">
-          <Link href={`/novels/${novelId}`}>
-            <Button type="button" variant="secondary">
-              取消
+        <div className="flex flex-1 flex-col items-end gap-1">
+          <label className="flex w-full flex-col gap-1">
+            <span className="text-xs font-medium text-gray-500">
+              创作过程记录
+            </span>
+            <textarea
+              value={aiPromptLog}
+              onChange={(e) => setAiPromptLog(e.target.value)}
+              placeholder="（选填）创作过程记录，如：先扩写 X 千字，再砍掉支线"
+              rows={2}
+              className="w-full rounded border border-gray-200 bg-white/95 p-2 text-xs"
+            />
+          </label>
+          <label className="flex w-full flex-col gap-1">
+            <span className="text-xs font-medium text-gray-500">
+              编辑结论
+            </span>
+            <textarea
+              value={revisionNote}
+              onChange={(e) => setRevisionNote(e.target.value)}
+              placeholder="（选填）终稿结论，如：觉醒段落重写完成，逻辑闭环"
+              rows={2}
+              className="w-full rounded border border-gray-200 bg-white/95 p-2 text-xs"
+            />
+          </label>
+          <div className="flex items-center gap-3">
+            <Link href={`/novels/${novelId}`}>
+              <Button type="button" variant="secondary">
+                取消
+              </Button>
+            </Link>
+            <Button
+              type="submit"
+              disabled={saveState === "saving"}
+              className={buttonClass}
+            >
+              {saveState === "saving"
+                ? "保存中…"
+                : saveState === "success"
+                  ? "✓ 已保存"
+                  : "保存章节"}
             </Button>
-          </Link>
-          <Button
-            type="submit"
-            disabled={saveState === "saving"}
-            className={buttonClass}
-          >
-            {saveState === "saving"
-              ? "保存中…"
-              : saveState === "success"
-                ? "✓ 已保存"
-                : "保存章节"}
-          </Button>
+            {mode === "edit" && chapterId && (
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={saveState === "saving"}
+                onClick={handleDeleteChapter}
+                className="text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+              >
+                删除本章
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

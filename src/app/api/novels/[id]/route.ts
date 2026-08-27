@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { NovelStatus, Role } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
@@ -115,6 +115,10 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   const { error } = await assertOwner(params.id);
   if (error) return error;
 
-  await prisma.novel.delete({ where: { id: params.id } });
-  return ok({ id: params.id });
+  await prisma.$transaction(async (tx) => {
+    await tx.novelChapter.deleteMany({ where: { novelId: params.id } });
+    await tx.novel.delete({ where: { id: params.id } });
+  });
+
+  return new NextResponse(null, { status: 204 });
 }

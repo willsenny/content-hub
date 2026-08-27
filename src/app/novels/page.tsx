@@ -39,6 +39,8 @@ export default async function NovelsPage({ searchParams }: PageProps) {
         basePath="/novels"
         page={data.page}
         totalPages={data.totalPages}
+        currentUserId={session?.user?.id ?? null}
+        isAdmin={session?.user?.role === Role.ADMIN}
       />
     </main>
   );

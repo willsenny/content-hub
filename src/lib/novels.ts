@@ -11,6 +11,7 @@ export interface NovelListItem {
   status: NovelStatus;
   totalChapters: number;
   updatedAt: Date;
+  authorId: string;
   author: { name: string | null } | null;
   publishedChapters: number;
 }
@@ -53,6 +54,7 @@ export async function listNovelsForUser(
         status: true,
         totalChapters: true,
         updatedAt: true,
+        authorId: true,
         author: { select: { name: true } },
         _count: {
           select: { chapters: { where: { status: "PUBLISHED" } } },
@@ -70,6 +72,7 @@ export async function listNovelsForUser(
     status: n.status,
     totalChapters: n.totalChapters,
     updatedAt: n.updatedAt,
+    authorId: n.authorId,
     author: n.author,
     publishedChapters: n._count.chapters,
   }));

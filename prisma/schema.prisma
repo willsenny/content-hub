@@ -51,6 +51,8 @@ model Novel {
   coverImage    String?
   status        NovelStatus @default(DRAFT)
   totalChapters Int         @default(0)
+  outlinePromptLog String?  @map("outline_prompt_log") 
+  outlineNote      String?  @map("outline_note")  
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -71,6 +73,9 @@ model NovelChapter {
   content       String        @db.Text
   wordCount     Int           @default(0)
   status        ChapterStatus @default(DRAFT)
+  aiPromptLog   String?   @map("ai_prompt_log")   
+  revisionNote  String?   @map("revision_note")  
+  contentHash   String?   @map("content_hash")     
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
